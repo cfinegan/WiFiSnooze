@@ -1,0 +1,2 @@
+rootProject.name = "WiFiSnooze"
+include ':app'
