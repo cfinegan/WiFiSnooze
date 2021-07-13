@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TableLayout;
 import android.widget.TableRow;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity
@@ -26,10 +27,15 @@ public class MainActivity extends AppCompatActivity
             Manifest.permission.ACCESS_WIFI_STATE, Manifest.permission.CHANGE_WIFI_STATE};
     private static final int REQUEST_PERMISSIONS = 1;
 
+    private TextView timerView;
     private Button startSnoozeButton;
     private TableLayout numberPad;
     private WifiManager wifi;
     private StringBuilder timerText;
+
+    private void refreshTimerView() {
+        timerView.setText(timerText.toString());
+    }
 
     public void onStartSnoozeClick(View view) {
         boolean enabled = wifi.isWifiEnabled();
@@ -43,14 +49,17 @@ public class MainActivity extends AppCompatActivity
         if (timerText.length() < 6) {
             timerText.append(btn.getText());
         }
+        refreshTimerView();
     }
 
     public void onClearClick(View view) {
         timerText.setLength(0);
+        refreshTimerView();
     }
 
     public void onBackspaceClick(View view) {
         timerText.setLength(Math.max(timerText.length() - 1, 0));
+        refreshTimerView();
     }
 
     @Override
@@ -106,6 +115,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         // Initialize member variables.
+        timerView = findViewById(R.id.timerView);
         startSnoozeButton = findViewById(R.id.startSnoozeButton);
         numberPad = findViewById(R.id.numberPad);
         wifi = (WifiManager)getApplicationContext().getSystemService(Context.WIFI_SERVICE);
