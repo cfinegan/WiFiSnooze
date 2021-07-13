@@ -45,6 +45,14 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    public void onClearClick(View view) {
+        timerText.setLength(0);
+    }
+
+    public void onBackspaceClick(View view) {
+        timerText.setLength(Math.max(timerText.length() - 1, 0));
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                     @NonNull int[] grantResults) {
@@ -105,9 +113,9 @@ public class MainActivity extends AppCompatActivity
 
         // UI Glue
         startSnoozeButton.setOnClickListener(this::onStartSnoozeClick);
+        TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT);
         for (int i = 0; i < 3; ++i) {
             TableRow row = new TableRow(this);
-            TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT);
             row.setLayoutParams(lp);
             for (int j = 1; j <= 3; ++j) {
                 Button btn = new Button(this);
@@ -117,5 +125,23 @@ public class MainActivity extends AppCompatActivity
             }
             numberPad.addView(row);
         }
+        TableRow finalRow = new TableRow(this);
+        finalRow.setLayoutParams(lp);
+        // Clear button
+        Button clearBtn = new Button(this);
+        clearBtn.setText("C");
+        clearBtn.setOnClickListener(this::onClearClick);
+        finalRow.addView(clearBtn);
+        // Zero button
+        Button zeroBtn = new Button(this);
+        zeroBtn.setText("0");
+        zeroBtn.setOnClickListener(this::onNumberClick);
+        finalRow.addView(zeroBtn);
+        // Backspace button
+        Button backspaceBtn = new Button(this);
+        backspaceBtn.setText("<-");
+        backspaceBtn.setOnClickListener(this::onBackspaceClick);
+        finalRow.addView(backspaceBtn);
+        numberPad.addView(finalRow);
     }
 }
