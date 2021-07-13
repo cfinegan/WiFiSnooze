@@ -7,12 +7,16 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity
@@ -22,6 +26,8 @@ public class MainActivity extends AppCompatActivity
             Manifest.permission.ACCESS_WIFI_STATE, Manifest.permission.CHANGE_WIFI_STATE};
     private static final int REQUEST_PERMISSIONS = 1;
 
+    private Button startSnoozeButton;
+    private TableLayout numberPad;
     private WifiManager wifi;
     private StringBuilder timerText;
 
@@ -30,6 +36,13 @@ public class MainActivity extends AppCompatActivity
         Log.d("WIFI", String.format("wifi enabled: %b", enabled));
         boolean result = wifi.setWifiEnabled(!enabled);
         Log.d("WIFI", String.format("wifi result: %b", result));
+    }
+
+    public void onNumberClick(View view) {
+        Button btn = (Button)view;
+        if (timerText.length() < 6) {
+            timerText.append(btn.getText());
+        }
     }
 
     @Override
@@ -57,6 +70,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,7 +98,24 @@ public class MainActivity extends AppCompatActivity
         }
 
         // Initialize member variables.
+        startSnoozeButton = findViewById(R.id.startSnoozeButton);
+        numberPad = findViewById(R.id.numberPad);
         wifi = (WifiManager)getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         timerText = new StringBuilder();
+
+        // UI Glue
+        startSnoozeButton.setOnClickListener(this::onStartSnoozeClick);
+        for (int i = 0; i < 3; ++i) {
+            TableRow row = new TableRow(this);
+            TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT);
+            row.setLayoutParams(lp);
+            for (int j = 1; j <= 3; ++j) {
+                Button btn = new Button(this);
+                btn.setText(Integer.toString(i * 3 + j));
+                btn.setOnClickListener(this::onNumberClick);
+                row.addView(btn);
+            }
+            numberPad.addView(row);
+        }
     }
 }
