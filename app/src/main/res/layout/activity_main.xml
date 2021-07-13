@@ -31,9 +31,10 @@
 
     <TextView
         android:id="@+id/timerView"
-        android:layout_width="176dp"
-        android:layout_height="43dp"
+        android:layout_width="197dp"
+        android:layout_height="59dp"
         android:text=""
+        android:textSize="20sp"
         app:layout_constraintBottom_toTopOf="@+id/numberPad"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

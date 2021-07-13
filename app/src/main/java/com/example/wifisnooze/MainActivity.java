@@ -34,7 +34,13 @@ public class MainActivity extends AppCompatActivity
     private StringBuilder timerText;
 
     private void refreshTimerView() {
-        timerView.setText(timerText.toString());
+        StringBuilder staging = new StringBuilder(6);
+        for (int i = 0; i < (6 - timerText.length()); ++i) {
+            staging.append('0');
+        }
+        staging.append(timerText);
+        timerView.setText(String.format("%sh %sm %ss",
+                staging.substring(0, 2), staging.substring(2, 4), staging.substring(4, 6)));
     }
 
     public void onStartSnoozeClick(View view) {
@@ -119,7 +125,7 @@ public class MainActivity extends AppCompatActivity
         startSnoozeButton = findViewById(R.id.startSnoozeButton);
         numberPad = findViewById(R.id.numberPad);
         wifi = (WifiManager)getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        timerText = new StringBuilder();
+        timerText = new StringBuilder(6);
 
         // UI Glue
         startSnoozeButton.setOnClickListener(this::onStartSnoozeClick);
@@ -153,5 +159,7 @@ public class MainActivity extends AppCompatActivity
         backspaceBtn.setOnClickListener(this::onBackspaceClick);
         finalRow.addView(backspaceBtn);
         numberPad.addView(finalRow);
+
+        refreshTimerView();
     }
 }
