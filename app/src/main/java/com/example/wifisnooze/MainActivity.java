@@ -9,10 +9,10 @@ import androidx.core.content.ContextCompat;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TableLayout;
@@ -20,12 +20,24 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.joda.time.DateTime;
+
 public class MainActivity extends AppCompatActivity
         implements ActivityCompat.OnRequestPermissionsResultCallback {
 
     private static final String[] PERMISSIONS = new String[]{
             Manifest.permission.ACCESS_WIFI_STATE, Manifest.permission.CHANGE_WIFI_STATE};
     private static final int REQUEST_PERMISSIONS = 1;
+    private static final int MAX_TIMER_DIGITS = 6;
+
+    private static StringBuilder getPaddedText(StringBuilder text) {
+        StringBuilder paddedText = new StringBuilder(MAX_TIMER_DIGITS);
+        for (int i = 0; i < (MAX_TIMER_DIGITS - text.length()); ++i) {
+            paddedText.append('0');
+        }
+        paddedText.append(text);
+        return paddedText;
+    }
 
     private TextView timerView;
     private Button startSnoozeButton;
@@ -34,25 +46,27 @@ public class MainActivity extends AppCompatActivity
     private StringBuilder timerText;
 
     private void refreshTimerView() {
-        StringBuilder staging = new StringBuilder(6);
-        for (int i = 0; i < (6 - timerText.length()); ++i) {
-            staging.append('0');
-        }
-        staging.append(timerText);
+        StringBuilder staging = getPaddedText(timerText);
         timerView.setText(String.format("%sh %sm %ss",
                 staging.substring(0, 2), staging.substring(2, 4), staging.substring(4, 6)));
     }
 
     public void onStartSnoozeClick(View view) {
-        boolean enabled = wifi.isWifiEnabled();
-        Log.d("WIFI", String.format("wifi enabled: %b", enabled));
-        boolean result = wifi.setWifiEnabled(!enabled);
-        Log.d("WIFI", String.format("wifi result: %b", result));
+        StringBuilder staging = getPaddedText(timerText);
+
+        int hours = Integer.parseInt(staging.substring(0, 2));
+        int minutes = Integer.parseInt(staging.substring(2, 4));
+        int seconds = Integer.parseInt(staging.substring(4, 6));
+
+        Intent intent = new Intent(this, CountdownActivity.class);
+        intent.putExtra(CountdownActivity.ARG_UNSNOOZE_TIME,
+                DateTime.now().plusHours(hours).plusMinutes(minutes).plusSeconds(seconds));
+        startActivity(intent);
     }
 
     public void onNumberClick(View view) {
         Button btn = (Button)view;
-        if (timerText.length() < 6) {
+        if (timerText.length() < MAX_TIMER_DIGITS) {
             timerText.append(btn.getText());
         }
         refreshTimerView();
@@ -125,7 +139,7 @@ public class MainActivity extends AppCompatActivity
         startSnoozeButton = findViewById(R.id.startSnoozeButton);
         numberPad = findViewById(R.id.numberPad);
         wifi = (WifiManager)getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        timerText = new StringBuilder(6);
+        timerText = new StringBuilder(MAX_TIMER_DIGITS);
 
         // UI Glue
         startSnoozeButton.setOnClickListener(this::onStartSnoozeClick);
