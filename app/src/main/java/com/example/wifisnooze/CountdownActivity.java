@@ -55,9 +55,6 @@ public class CountdownActivity extends AppCompatActivity {
         updateCountdownView(untilUnsnooze.getMillis());
 
         wifi = (WifiManager)getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        if (!wifi.setWifiEnabled(false)) {
-            finish();
-        }
 
         timer = new SnoozeTimer(untilUnsnooze.getMillis());
         timer.start();
