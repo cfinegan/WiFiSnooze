@@ -40,8 +40,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     private TextView timerView;
-    private Button startSnoozeButton;
-    private TableLayout numberPad;
     private WifiManager wifi;
     private StringBuilder timerText;
 
@@ -153,13 +151,15 @@ public class MainActivity extends AppCompatActivity
 
         // Initialize member variables.
         timerView = findViewById(R.id.timerView);
-        startSnoozeButton = findViewById(R.id.startSnoozeButton);
-        numberPad = findViewById(R.id.numberPad);
         wifi = (WifiManager)getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         timerText = new StringBuilder(MAX_TIMER_DIGITS);
 
-        // UI Glue
+        // Setup snooze button.
+        Button startSnoozeButton = findViewById(R.id.startSnoozeButton);
         startSnoozeButton.setOnClickListener(this::onStartSnoozeClick);
+
+        // Setup number pad.
+        TableLayout numberPad = findViewById(R.id.numberPad);
         TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT);
         for (int i = 0; i < 3; ++i) {
             TableRow row = new TableRow(this);
