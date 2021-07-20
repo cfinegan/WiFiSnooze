@@ -57,22 +57,12 @@ public class MainActivity extends AppCompatActivity
         int seconds = Integer.parseInt(staging.substring(4, 6));
 
         Intent intent = new Intent(this, CountdownActivity.class);
+        intent.putExtra(CountdownActivity.ARG_PREV_WIFI_STATE, wifi.getWifiState());
         intent.putExtra(CountdownActivity.ARG_UNSNOOZE_TIME,
                 DateTime.now().plusHours(hours).plusMinutes(minutes).plusSeconds(seconds));
 
-        int prevState = wifi.getWifiState();
         if (wifi.setWifiEnabled(false)) {
-            try {
-                startActivity(intent);
-            } catch (Exception e) {
-                // Provide a "strong exception guarantee" for disabling wifi -  the wifi only stays
-                // disabled if countdown activity is successfully launched.
-                if (prevState == WifiManager.WIFI_STATE_ENABLED
-                        || prevState == WifiManager.WIFI_STATE_ENABLING) {
-                    wifi.setWifiEnabled(true);
-                }
-                throw e;
-            }
+            startActivity(intent);
         } else {
             Toast.makeText(getApplicationContext(),
                     "failed to start countdown activity", Toast.LENGTH_SHORT).show();

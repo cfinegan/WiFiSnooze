@@ -18,13 +18,13 @@ import org.joda.time.Duration;
 public class CountdownActivity extends AppCompatActivity {
 
     public static final String ARG_UNSNOOZE_TIME = "Unsnooze Time";
+    public static final String ARG_PREV_WIFI_STATE = "Previous WiFi State";
 
     private TextView countdownView;
-    private Button cancelButton;
     private DateTime unsnoozeTime;
     private WifiManager wifi;
     private CountDownTimer timer;
-
+    private int prevWifiState;
 
     @SuppressLint("DefaultLocale")
     private void updateCountdownView(long milliseconds) {
@@ -37,7 +37,10 @@ public class CountdownActivity extends AppCompatActivity {
 
     private void onCancelClick(View view) {
         timer.cancel();
-        // TODO: should we re-enabled WiFi here?
+        if (prevWifiState == WifiManager.WIFI_STATE_ENABLED
+                || prevWifiState == WifiManager.WIFI_STATE_ENABLING) {
+            wifi.setWifiEnabled(true);
+        }
         finish();
     }
 
@@ -47,12 +50,15 @@ public class CountdownActivity extends AppCompatActivity {
         setContentView(R.layout.activity_countdown);
 
         countdownView = findViewById(R.id.countdownView);
-        cancelButton = findViewById(R.id.cancelButton);
+
+        Button cancelButton = findViewById(R.id.cancelButton);
         cancelButton.setOnClickListener(this::onCancelClick);
 
         unsnoozeTime = (DateTime)getIntent().getSerializableExtra(ARG_UNSNOOZE_TIME);
         Duration untilUnsnooze = new Duration(DateTime.now(), unsnoozeTime);
         updateCountdownView(untilUnsnooze.getMillis());
+
+        prevWifiState = getIntent().getIntExtra(ARG_PREV_WIFI_STATE, -1);
 
         wifi = (WifiManager)getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 
