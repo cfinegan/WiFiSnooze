@@ -29,10 +29,21 @@ public class CountdownActivity extends AppCompatActivity {
     @SuppressLint("DefaultLocale")
     private void updateCountdownView(long milliseconds) {
         Duration duration = new Duration(milliseconds);
-        long hours = duration.getStandardHours();
-        long minutes = duration.getStandardMinutes();
-        long seconds = duration.getStandardSeconds();
+        long totalSeconds = duration.getStandardSeconds();
+        long seconds = totalSeconds % 60;
+        long totalMinutes = totalSeconds / 60 ;
+        long minutes = totalMinutes % 60;
+        long hours = totalMinutes / 60;
         countdownView.setText(String.format("%dh %dm %ds", hours, minutes, seconds));
+    }
+
+    private void onAddOneMinClick(View view) {
+        unsnoozeTime = unsnoozeTime.plusMinutes(1);
+        long untilUnsnooze = new Duration(DateTime.now(), unsnoozeTime).getMillis();
+        timer.cancel();
+        timer = new SnoozeTimer(untilUnsnooze);
+        timer.start();
+        updateCountdownView(untilUnsnooze);
     }
 
     private void onCancelClick(View view) {
@@ -50,6 +61,9 @@ public class CountdownActivity extends AppCompatActivity {
         setContentView(R.layout.activity_countdown);
 
         countdownView = findViewById(R.id.countdownView);
+
+        Button addOneMinButton = findViewById(R.id.addOneMinButton);
+        addOneMinButton.setOnClickListener(this::onAddOneMinClick);
 
         Button cancelButton = findViewById(R.id.cancelButton);
         cancelButton.setOnClickListener(this::onCancelClick);
